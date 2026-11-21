@@ -1,0 +1,149 @@
+configurações dos especificadores %d %f %e %g
+
+flags consideradas: 0, -
+
+
+
+
+
+
+modelo %m.pX
+
+m = minimum field width
+p = precision
+X = conversion specifier (generic to represent the 'type' character)
+
+
+
+
+
+especificadores
+	%d
+	%f
+	%e
+	%g
+
+elementos
+	m indica o espaço mínimo em caracteres	 (completando com espaços à esquerda, alinhando o conteúdo à direita por padrão)
+	p indica a precisão (precision); seu significado depende do especificador de conversão
+
+flags
+	- (%-m.pX) alinha o conteúdo à esquerda, fazendo com que qualquer eventual preenchimento feito por m seja posto à direita, invertendo o padrão de alinhamento
+	0 (%0m.pX) faz com que m complete com zeros (0) ao invés de espaços
+
+
+
+
+************
+
+m conta todos os caracteres da representação resultante, incluindo sinal, ponto decimal, zeros de preenchimento e, quando houver, os caracteres do expoente
+
+m altera a saída somente quando a representação ocupa menos caracteres que a largura mínima. Nesse caso, o preenchimento completa o campo; se a representação já atingir ou exceder a largura, nenhum preenchimento adicional é necessário
+
+as flags mencionadas afetam o comportamento de m e devem sempre ser postas entre % e m 
+[%-m.pX, %0m.pX]
+
+quando - e 0 são usados juntos, 0 é ignorado
+
+caso p seja omitido [%mX], é considerado seu valor padrão para o especificador em questão
+
+quando um número negativo é formatado com a flag 0 (ex.: %05d ou %08.2f para -42), o sinal de menos vem antes dos zeros de preenchimento
+
+
+************
+
+
+
+
+%d
+	comportamento de m: padrão
+
+	comportamento de p: define a quantidade mínima de algarismos inteiros, não interfere caso a quantidade seja excedida; se necessário, zeros são adicionados à esquerda dos algarismos, depois do sinal, se houver.
+
+	comportamento de -: padrão
+
+	comportamento de 0: quando p é explicitamente especificada, 0 é ignorada.
+
+
+%f
+	comportamento de m: padrão
+
+	comportamento de p: determina a quantidade de casas decimais exibidas; se houver menos casas, zeros são adicionados à direita; se houver casas excedentes, o valor é arredondado
+
+
+	comportamento de -: padrão
+
+	comportamento de 0: a precisão explícita não desativa 0
+
+
+%e
+	comportamento de m: padrão
+
+	comportamento de p: determina a quantidade de casas decimais exibidas na mantissa; se houver menos casas, zeros são adicionados à direita; se houver casas excedentes, o valor é arredondado
+
+	comportamento de -: padrão
+
+	comportamento de 0: a precisão explícita não desativa 0
+
+
+%g
+	comportamento de m: padrão
+
+	comportamento de p: define a quantidade máxima de algarismos significativos; se necessário, o valor é arredondado para respeitar esse limite. zeros finais da parte fracionária são removidos, salvo quando a flag # é utilizada. A notação fixa ou científica é escolhida conforme a magnitude do valor e a precisão especificada
+
+	comportamento de -: padrão
+
+	comportamento de 0: a precisão explícita não desativa 0
+
+
+
+
+
+
+
+**********
+	%.0d não produz saída quando a entrada é 0
+printf("|%.0d|", 0);    // ||
+printf("|%.0d|", 7);    // |7|
+printf("|%.0d|", 42);   // |42|
+printf("|%.0d|", 123);  // |123|
+**********
+
+
+quando %f, %e ou %g precisam descartar algarismos para
+satisfazer a precisão, considerando o arredondamento para o valor mais próximo com desempate para par:
+- se o primeiro algarismo descartado for de 0 a 4, o último algarismo preservado não é incrementado.
+- se for de 6 a 9, o último algarismo preservado é incrementado.
+- se for 5 seguido por algum algarismo diferente de zero, o valor está acima do ponto médio e é arredondado para cima.
+- se for 5 seguido apenas por zeros, ocorre um empate exato; o resultado depende do modo de arredondamento aplicável.
+
+se o valor efetivamente representado estiver exatamente no meio entre dois resultados possíveis, o resultado depende do modo de arredondamento. no modo round to nearest, ties to even, escolhe-se o resultado cujo último algarismo preservado é par
+
+
+
+
+valores padrão de p
+
+%d - 1
+
+%f - 6
+
+%e - 6
+
+%g - 6 (algarismos significativos)
+
+
+
+
+
+***********
+regra de formatação %g:
+
+- após o arredondamento, se o expoente decimal for menor que −4 ou maior ou igual à precisão, %g utiliza notação científica; caso contrário, utiliza notação decimal fixa
+- caso contrário, usa o formato %f
+
+nota: se p = 0 for especificado em %g, o C o trata automaticamente como p = 1
+
+***********
+
+
